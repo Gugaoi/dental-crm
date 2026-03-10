@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local server
+*.log
+
+# SSH keys (never commit these!)
+dental-crm-deploy
+dental-crm-deploy.pub
+
+# Node (future)
+node_modules/
+.env
+.env.local

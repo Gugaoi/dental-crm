@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DentalCRM – Gestão Completa para Clínicas Odontológicas</title>
+  <meta name="description" content="CRM completo para clínicas odontológicas: agendamento, leads, prontuário, WhatsApp, RH, estoque e muito mais." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🦷</div>
+      <div>
+        <div class="sidebar-logo-text">DentalCRM</div>
+        <div class="sidebar-logo-sub">Gestão Odontológica</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard',this)">
+        <span class="nav-icon">📊</span><span class="nav-label">Dashboard</span>
+      </div>
+
+      <div class="nav-section-label">CRM</div>
+      <div class="nav-item" data-page="leads" onclick="navigate('leads',this)">
+        <span class="nav-icon">🎯</span><span class="nav-label">Leads / Pipeline</span>
+        <span class="nav-badge">12</span>
+      </div>
+      <div class="nav-item" data-page="patients" onclick="navigate('patients',this)">
+        <span class="nav-icon">👥</span><span class="nav-label">Pacientes</span>
+      </div>
+      <div class="nav-item" data-page="schedule" onclick="navigate('schedule',this)">
+        <span class="nav-icon">📅</span><span class="nav-label">Agendamento</span>
+      </div>
+      <div class="nav-item" data-page="prontuario" onclick="navigate('prontuario',this)">
+        <span class="nav-icon">📋</span><span class="nav-label">Prontuário</span>
+      </div>
+
+      <div class="nav-section-label">Comunicação</div>
+      <div class="nav-item" data-page="whatsapp" onclick="navigate('whatsapp',this)">
+        <span class="nav-icon">💬</span><span class="nav-label">WhatsApp</span>
+        <span class="nav-badge">3</span>
+      </div>
+
+      <div class="nav-section-label">Gestão</div>
+      <div class="nav-item" data-page="hr" onclick="navigate('hr',this)">
+        <span class="nav-icon">👤</span><span class="nav-label">RH</span>
+      </div>
+      <div class="nav-item" data-page="stock" onclick="navigate('stock',this)">
+        <span class="nav-icon">📦</span><span class="nav-label">Estoque</span>
+      </div>
+      <div class="nav-item" data-page="financial" onclick="navigate('financial',this)">
+        <span class="nav-icon">💰</span><span class="nav-label">Financeiro</span>
+      </div>
+      <div class="nav-item" data-page="reports" onclick="navigate('reports',this)">
+        <span class="nav-icon">📈</span><span class="nav-label">Relatórios</span>
+      </div>
+
+      <div class="nav-section-label">Conta</div>
+      <div class="nav-item" data-page="plans" onclick="navigate('plans',this)">
+        <span class="nav-icon">⭐</span><span class="nav-label">Planos</span>
+      </div>
+      <div class="nav-item" data-page="settings" onclick="navigate('settings',this)">
+        <span class="nav-icon">⚙️</span><span class="nav-label">Configurações</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">DR</div>
+        <div class="user-info">
+          <div class="user-name">Dr. Roberto Silva</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main-content" id="mainContent">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="topbar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">☰</button>
+      <div class="topbar-breadcrumb">
+        <div class="topbar-page-title" id="pageTitle">Dashboard</div>
+        <div class="topbar-page-sub" id="pageSub">Visão geral da clínica</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="clinic-switcher">
+          <span class="clinic-dot"></span>
+          Clínica Sorriso
+          <span style="color:var(--text-muted);font-size:12px">▾</span>
+        </div>
+        <button class="topbar-btn" title="Pesquisar">🔍</button>
+        <button class="topbar-btn" title="Notificações" id="notifBtn" onclick="showToast('Você tem 5 notificações não lidas','info')">
+          🔔
+          <span class="topbar-notif-dot"></span>
+        </button>
+        <div class="user-avatar" style="cursor:pointer">DR</div>
+      </div>
+    </header>
+
+    <!-- =========================================================
+         PAGE: DASHBOARD
+    ========================================================= -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-inner">
+        <!-- KPI Cards -->
+        <div class="grid grid-4 mb-20">
+          <div class="kpi-card blue">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-label">Pacientes Hoje</div>
+            <div class="kpi-value">18</div>
+            <div class="kpi-change up">▲ 12% vs ontem</div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-label">Receita do Mês</div>
+            <div class="kpi-value">R$42.8k</div>
+            <div class="kpi-change up">▲ 8% vs mês anterior</div>
+          </div>
+          <div class="kpi-card yellow">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-label">Leads Ativos</div>
+            <div class="kpi-value">34</div>
+            <div class="kpi-change up">▲ 5 novos esta semana</div>
+          </div>
+          <div class="kpi-card purple">
+            <div class="kpi-icon">📅</div>
+            <div class="kpi-label">Consultas Pendentes</div>
+            <div class="kpi-value">7</div>
+            <div class="kpi-change down">▼ 2 cancelamentos</div>
+          </div>
+        </div>
+
+        <div class="grid grid-21 mb-20">
+          <!-- Revenue Chart -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Receita vs Despesas</div>
+                <div class="text-sm text-muted mt-4">Últimos 6 meses</div>
+              </div>
+              <div class="chart-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Receita</div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--accent-6)"></div>Despesas</div>
+              </div>
+            </div>
+            <div class="chart-bars" id="revenueChart" style="height:180px;align-items:flex-end;display:flex;gap:8px;padding:0 10px"></div>
+            <div class="chart-labels" id="revenueLabels"></div>
+          </div>
+
+          <!-- Upcoming Appointments -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <div class="chart-title">Próximas Consultas</div>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('schedule',null)">Ver todas</button>
+            </div>
+            <div id="upcomingAppts"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-21">
+          <!-- Recent Leads -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <div class="chart-title">Leads Recentes</div>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('leads',null)">Ver todos</button>
+            </div>
+            <div class="table-wrap">
+              <table class="table" id="dashLeadsTable"></table>
+            </div>
+          </div>
+
+          <!-- Tasks -->
+          <div class="chart-container">
+            <div class="chart-header">
+              <div class="chart-title">Tarefas</div>
+              <span class="badge badge-blue" id="taskCount">0 pendentes</span>
+            </div>
+            <div id="taskList"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: LEADS / PIPELINE
+    ========================================================= -->
+    <div class="page" id="page-leads">
+      <div class="page-inner">
+        <div class="section-header mb-20">
+          <div>
+            <div class="section-title">Pipeline de Leads</div>
+            <div class="section-sub">Gerencie seus leads por estágio</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('addLeadModal')">+ Novo Lead</button>
+        </div>
+        <div class="kanban-board" id="kanbanBoard"></div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: PATIENTS
+    ========================================================= -->
+    <div class="page" id="page-patients">
+      <div class="page-inner">
+        <div class="section-header mb-20">
+          <div>
+            <div class="section-title">Pacientes</div>
+            <div class="section-sub">Cadastro e histórico</div>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('addPatientModal')">+ Novo Paciente</button>
+        </div>
+        <div class="card mb-20">
+          <div class="flex items-center gap-12">
+            <div class="search-bar" style="flex:1">
+              <span class="search-icon">🔍</span>
+              <input type="text" placeholder="Buscar paciente por nome, CPF ou telefone..." oninput="filterPatients(this.value)" />
+            </div>
+            <select class="input" style="width:180px" onchange="filterPatientsByStatus(this.value)">
+              <option value="">Todos os status</option>
+              <option value="Ativo">Ativo</option>
+              <option value="Inativo">Inativo</option>
+              <option value="Em tratamento">Em tratamento</option>
+            </select>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table class="table" id="patientsTable"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: SCHEDULE
+    ========================================================= -->
+    <div class="page" id="page-schedule">
+      <div class="page-inner">
+        <div class="calendar-header">
+          <div>
+            <div class="section-title">Agendamento</div>
+            <div class="section-sub">Março 2026</div>
+          </div>
+          <div class="calendar-nav">
+            <button class="btn btn-secondary btn-sm" onclick="changeMonth(-1)">◀</button>
+            <span class="calendar-month" id="calMonthLabel">Março 2026</span>
+            <button class="btn btn-secondary btn-sm" onclick="changeMonth(1)">▶</button>
+          </div>
+          <div class="flex items-center gap-8">
+            <div class="calendar-view-btns">
+              <button class="cal-view-btn active" id="calViewMonth" onclick="setCalView('month',this)">Mês</button>
+              <button class="cal-view-btn" id="calViewWeek" onclick="setCalView('week',this)">Semana</button>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openModal('addApptModal')">+ Agendar</button>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: PRONTUÁRIO
+    ========================================================= -->
+    <div class="page" id="page-prontuario">
+      <div class="page-inner">
+        <div class="section-header mb-20">
+          <div>
+            <div class="section-title">Prontuário Digital</div>
+            <div class="section-sub">Registro de tratamentos e histórico do paciente</div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-secondary btn-sm" onclick="navigate('patients',null)">← Pacientes</button>
+            <button class="tts-btn" id="ttsBtn" onclick="toggleTTS()">🔊 Ler Prontuário</button>
+          </div>
+        </div>
+
+        <div class="grid grid-21">
+          <!-- Left: Form -->
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div class="card">
+              <div class="chart-header mb-16">
+                <div class="chart-title">Paciente</div>
+                <div class="badge badge-green">Em tratamento</div>
+              </div>
+              <div class="flex items-center gap-12 mb-16">
+                <div class="user-avatar avatar-lg" style="background:linear-gradient(135deg,var(--accent-4),var(--accent-3))">MJ</div>
+                <div>
+                  <div style="font-size:18px;font-weight:800">Maria José Santos</div>
+                  <div class="text-sm text-muted">CPF: 012.345.678-90 • Nascimento: 15/03/1985 (41 anos)</div>
+                  <div class="text-sm text-muted">📱 (11) 98765-4321 • 📧 mariajose@email.com</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="chart-title mb-16">Queixa Principal</div>
+              <div class="input-group">
+                <textarea class="input" rows="3" id="chiefComplaint" placeholder="Descreva a queixa principal do paciente...">Dor de dente no molar inferior direito há 3 dias, sensibilidade ao frio e ao morder.</textarea>
+              </div>
+              <div class="chart-title mb-16">Diagnóstico</div>
+              <div class="input-group">
+                <textarea class="input" rows="2" id="diagnosis" placeholder="Diagnóstico clínico...">Cárie profunda em dente 46 com provável comprometimento pulpar. Indicado tratamento endodôntico.</textarea>
+              </div>
+              <div class="chart-title mb-16">Tratamento Realizado</div>
+              <div class="input-group">
+                <textarea class="input" rows="3" id="treatment" placeholder="Procedimentos realizados...">Radiografia periapical. Abertura coronária para endodontia. Curativo de demora com hidróxido de cálcio e Cresophene.</textarea>
+              </div>
+              <div class="chart-title mb-16">Prescrições</div>
+              <div class="input-group">
+                <textarea class="input" rows="2" id="prescription" placeholder="Medicamentos prescritos...">Amoxicilina 500mg - 1 cápsula de 8/8h por 7 dias. Ibuprofeno 600mg em caso de dor.</textarea>
+              </div>
+              <div class="chart-title mb-16">Observações</div>
+              <div class="input-group">
+                <textarea class="input" rows="2" id="observations" placeholder="Notas adicionais...">Paciente alérgica a Dipirona. Retornar em 7 dias para continuação do tratamento.</textarea>
+              </div>
+              <div class="flex gap-8">
+                <button class="btn btn-primary w-full" onclick="saveProntuario()">💾 Salvar Prontuário</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Odontogram + History -->
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div class="card">
+              <div class="chart-header mb-16">
+                <div class="chart-title">Odontograma</div>
+                <div class="flex gap-8">
+                  <span class="tag" style="border-color:var(--accent-4);color:var(--accent-4)">● Saudável</span>
+                  <span class="tag" style="border-color:var(--accent-6);color:var(--accent-6)">● Cárie</span>
+                  <span class="tag" style="border-color:var(--accent-5);color:var(--accent-5)">● Coroa</span>
+                </div>
+              </div>
+              <div class="odontogram" id="odontogram"></div>
+              <div class="text-sm text-muted mt-12" style="text-align:center">Clique em um dente para alterar o status</div>
+            </div>
+
+            <div class="card">
+              <div class="chart-title mb-16">Histórico de Tratamentos</div>
+              <div class="timeline" id="treatmentHistory"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: WHATSAPP
+    ========================================================= -->
+    <div class="page" id="page-whatsapp">
+      <div class="page-inner" style="padding-bottom:0">
+        <div class="tabs mb-20">
+          <button class="tab-btn active" onclick="switchTab('whatsapp','waChatTab',this)">Conversas</button>
+          <button class="tab-btn" onclick="switchTab('whatsapp','waTemplatesTab',this)">Templates</button>
+          <button class="tab-btn" onclick="switchTab('whatsapp','waCampaignsTab',this)">Campanhas</button>
+        </div>
+
+        <div class="tab-panel active" id="waChatTab">
+          <div class="chat-layout">
+            <div class="chat-list">
+              <div class="chat-list-header">
+                <h3>💬 Conversas</h3>
+                <div class="search-bar">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" placeholder="Buscar..." />
+                </div>
+              </div>
+              <div id="chatList"></div>
+            </div>
+            <div class="chat-main">
+              <div class="chat-topbar" id="chatTopbar"></div>
+              <div class="chat-messages" id="chatMessages"></div>
+              <div class="chat-input-bar">
+                <button class="btn btn-ghost btn-icon">📎</button>
+                <input type="text" class="chat-input" id="chatInput" placeholder="Digite uma mensagem..." onkeydown="if(event.key==='Enter')sendMsg()" />
+                <button class="send-btn" onclick="sendMsg()">➤</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="waTemplatesTab">
+          <div class="section-header mb-20">
+            <div class="section-title">Templates de Mensagem</div>
+            <button class="btn btn-primary" onclick="openModal('addTemplateModal')">+ Novo Template</button>
+          </div>
+          <div class="grid grid-3" id="templateList"></div>
+        </div>
+
+        <div class="tab-panel" id="waCampaignsTab">
+          <div class="section-header mb-20">
+            <div class="section-title">Campanhas</div>
+            <button class="btn btn-primary">+ Nova Campanha</button>
+          </div>
+          <div class="grid grid-3" id="campaignList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: HR
+    ========================================================= -->
+    <div class="page" id="page-hr">
+      <div class="page-inner">
+        <div class="tabs mb-20">
+          <button class="tab-btn active" onclick="switchTab('hr','hrStaffTab',this)">Equipe</button>
+          <button class="tab-btn" onclick="switchTab('hr','hrScheduleTab',this)">Escalas</button>
+          <button class="tab-btn" onclick="switchTab('hr','hrPayrollTab',this)">Folha de Pagamento</button>
+        </div>
+
+        <div class="tab-panel active" id="hrStaffTab">
+          <div class="section-header mb-20">
+            <div class="section-title">Equipe</div>
+            <button class="btn btn-primary" onclick="openModal('addStaffModal')">+ Novo Colaborador</button>
+          </div>
+          <div class="grid grid-4" id="staffGrid"></div>
+        </div>
+
+        <div class="tab-panel" id="hrScheduleTab">
+          <div class="section-header mb-20">
+            <div class="section-title">Escala da Semana</div>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table" id="hrScheduleTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="hrPayrollTab">
+          <div class="section-header mb-20">
+            <div class="section-title">Folha de Pagamento – Março 2026</div>
+            <button class="btn btn-secondary">📥 Exportar</button>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table" id="payrollTable"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: STOCK
+    ========================================================= -->
+    <div class="page" id="page-stock">
+      <div class="page-inner">
+        <div class="tabs mb-20">
+          <button class="tab-btn active" onclick="switchTab('stock','stockInventoryTab',this)">Inventário</button>
+          <button class="tab-btn" onclick="switchTab('stock','stockMovementsTab',this)">Movimentações</button>
+          <button class="tab-btn" onclick="switchTab('stock','stockSuppliersTab',this)">Fornecedores</button>
+        </div>
+
+        <div class="tab-panel active" id="stockInventoryTab">
+          <div class="section-header mb-20">
+            <div class="section-title">Inventário</div>
+            <div class="flex gap-8">
+              <button class="btn btn-secondary" onclick="openModal('addMovementModal')">+ Entrada</button>
+              <button class="btn btn-primary" onclick="openModal('addItemModal')">+ Novo Item</button>
+            </div>
+          </div>
+          <div id="stockAlerts" class="mb-20"></div>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table" id="stockTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="stockMovementsTab">
+          <div class="section-header mb-20"><div class="section-title">Movimentações</div></div>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table" id="movementsTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="stockSuppliersTab">
+          <div class="section-header mb-20">
+            <div class="section-title">Fornecedores</div>
+            <button class="btn btn-primary">+ Novo Fornecedor</button>
+          </div>
+          <div class="grid grid-3" id="suppliersList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: FINANCIAL
+    ========================================================= -->
+    <div class="page" id="page-financial">
+      <div class="page-inner">
+        <div class="tabs mb-20">
+          <button class="tab-btn active" onclick="switchTab('financial','finOverviewTab',this)">Visão Geral</button>
+          <button class="tab-btn" onclick="switchTab('financial','finPaymentsTab',this)">Pagamentos</button>
+          <button class="tab-btn" onclick="switchTab('financial','finInvoicesTab',this)">Notas Fiscais</button>
+        </div>
+
+        <div class="tab-panel active" id="finOverviewTab">
+          <div class="grid grid-4 mb-20">
+            <div class="kpi-card green"><div class="kpi-icon">💵</div><div class="kpi-label">Receita Total</div><div class="kpi-value">R$42.8k</div><div class="kpi-change up">▲ 8%</div></div>
+            <div class="kpi-card red"><div class="kpi-icon">💸</div><div class="kpi-label">Despesas</div><div class="kpi-value">R$18.2k</div><div class="kpi-change down">▲ 3%</div></div>
+            <div class="kpi-card blue"><div class="kpi-icon">📈</div><div class="kpi-label">Lucro Líquido</div><div class="kpi-value">R$24.6k</div><div class="kpi-change up">▲ 12%</div></div>
+            <div class="kpi-card yellow"><div class="kpi-icon">⏳</div><div class="kpi-label">A Receber</div><div class="kpi-value">R$8.4k</div><div class="kpi-change down">5 pendentes</div></div>
+          </div>
+          <div class="chart-container">
+            <div class="chart-header mb-16">
+              <div class="chart-title">Receita vs Despesas (Últimos 6 meses)</div>
+              <div class="chart-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:var(--accent-4)"></div>Receita</div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--accent-6)"></div>Despesas</div>
+              </div>
+            </div>
+            <div id="finChart" style="height:200px;display:flex;align-items:flex-end;gap:8px;padding:0 10px"></div>
+            <div id="finChartLabels" class="chart-labels"></div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="finPaymentsTab">
+          <div class="section-header mb-20">
+            <div class="section-title">Pagamentos</div>
+            <button class="btn btn-primary">+ Novo Lançamento</button>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table" id="paymentsTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="finInvoicesTab">
+          <div class="section-header mb-20">
+            <div class="section-title">Notas Fiscais</div>
+            <button class="btn btn-primary">+ Emitir NF</button>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table" id="invoicesTable"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: REPORTS
+    ========================================================= -->
+    <div class="page" id="page-reports">
+      <div class="page-inner">
+        <div class="section-header mb-20">
+          <div>
+            <div class="section-title">Relatórios</div>
+            <div class="section-sub">Análises e exportações</div>
+          </div>
+          <div class="flex gap-8">
+            <input type="date" class="input" style="width:160px" value="2026-03-01" />
+            <input type="date" class="input" style="width:160px" value="2026-03-31" />
+            <button class="btn btn-secondary" onclick="window.print()">📥 Exportar PDF</button>
+          </div>
+        </div>
+        <div class="grid grid-2 mb-20" id="reportCards"></div>
+        <div class="card">
+          <div class="chart-header mb-16">
+            <div class="chart-title">Produtividade por Profissional – Março 2026</div>
+          </div>
+          <div id="prodStats"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: PLANS
+    ========================================================= -->
+    <div class="page" id="page-plans">
+      <div class="page-inner">
+        <div style="text-align:center;margin-bottom:40px">
+          <div class="section-title" style="font-size:28px;font-weight:800;margin-bottom:10px">Escolha seu Plano</div>
+          <div class="section-sub" style="font-size:15px">Solução completa para sua clínica odontológica</div>
+        </div>
+        <div class="grid grid-3 mb-20" id="planCards"></div>
+        <div class="card">
+          <div class="chart-title mb-20" style="text-align:center">Comparativo Completo de Recursos</div>
+          <div class="table-wrap">
+            <table class="table" id="planCompareTable"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         PAGE: SETTINGS
+    ========================================================= -->
+    <div class="page" id="page-settings">
+      <div class="page-inner">
+        <div class="section-header mb-20">
+          <div class="section-title">Configurações</div>
+        </div>
+        <div class="tabs mb-20">
+          <button class="tab-btn active" onclick="switchTab('settings','setClinicTab',this)">Clínica</button>
+          <button class="tab-btn" onclick="switchTab('settings','setUsersTab',this)">Usuários</button>
+          <button class="tab-btn" onclick="switchTab('settings','setNotifTab',this)">Notificações</button>
+          <button class="tab-btn" onclick="switchTab('settings','setIntegTab',this)">Integrações</button>
+        </div>
+
+        <div class="tab-panel active" id="setClinicTab">
+          <div class="card">
+            <div class="chart-title mb-20">Perfil da Clínica</div>
+            <div class="input-row"><div class="input-group"><label class="input-label">Nome da Clínica</label><input class="input" value="Clínica Sorriso" /></div><div class="input-group"><label class="input-label">CNPJ</label><input class="input" value="12.345.678/0001-90" /></div></div>
+            <div class="input-row"><div class="input-group"><label class="input-label">Telefone</label><input class="input" value="(11) 3456-7890" /></div><div class="input-group"><label class="input-label">E-mail</label><input class="input" value="contato@clinicasorriso.com.br" /></div></div>
+            <div class="input-group"><label class="input-label">Endereço</label><input class="input" value="Rua das Flores, 123 – Centro, São Paulo – SP" /></div>
+            <div class="input-row"><div class="input-group"><label class="input-label">Horário de Atendimento</label><input class="input" value="Seg–Sex: 08:00–18:00 / Sáb: 08:00–13:00" /></div><div class="input-group"><label class="input-label">Especialidades</label><input class="input" value="Ortodontia, Implantes, Endodontia, Clínica Geral" /></div></div>
+            <button class="btn btn-primary" onclick="showToast('Configurações salvas!','success')">Salvar Alterações</button>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="setUsersTab">
+          <div class="section-header mb-20">
+            <div class="section-title" style="font-size:16px">Usuários e Permissões</div>
+            <button class="btn btn-primary btn-sm">+ Convidar Usuário</button>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table class="table" id="usersTable"></table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="setNotifTab">
+          <div class="card">
+            <div class="chart-title mb-20">Preferências de Notificação</div>
+            <div id="notifSettings"></div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="setIntegTab">
+          <div class="grid grid-2" id="integrations"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<!-- =====================================================
+     MODALS
+===================================================== -->
+<!-- Add Lead -->
+<div class="modal-overlay" id="addLeadModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Novo Lead</div><button class="modal-close" onclick="closeModal('addLeadModal')">✕</button></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Nome</label><input class="input" id="leadName" placeholder="Nome completo" /></div><div class="input-group"><label class="input-label">Telefone</label><input class="input" id="leadPhone" placeholder="(11) 99999-9999" /></div></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Interesse</label><input class="input" id="leadInterest" placeholder="Ex: Clareamento" /></div><div class="input-group"><label class="input-label">Origem</label><select class="input" id="leadSource"><option>Instagram</option><option>Google</option><option>Indicação</option><option>Site</option><option>WhatsApp</option></select></div></div>
+    <div class="input-group"><label class="input-label">Estágio</label><select class="input" id="leadStage"><option value="novo">Novo</option><option value="contato">Contactado</option><option value="consulta">Consulta Agendada</option></select></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addLeadModal')">Cancelar</button><button class="btn btn-primary" onclick="addLead()">Adicionar Lead</button></div>
+  </div>
+</div>
+
+<!-- Lead Detail -->
+<div class="modal-overlay" id="leadDetailModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title" id="leadDetailName">Detalhes do Lead</div><button class="modal-close" onclick="closeModal('leadDetailModal')">✕</button></div>
+    <div id="leadDetailContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('leadDetailModal')">Fechar</button>
+      <button class="btn btn-success" onclick="convertLead()">✓ Converter em Paciente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Patient -->
+<div class="modal-overlay" id="addPatientModal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">Novo Paciente</div><button class="modal-close" onclick="closeModal('addPatientModal')">✕</button></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Nome Completo</label><input class="input" id="patName" /></div><div class="input-group"><label class="input-label">Data de Nascimento</label><input class="input" type="date" id="patDob" /></div></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">CPF</label><input class="input" id="patCpf" /></div><div class="input-group"><label class="input-label">Telefone</label><input class="input" id="patPhone" /></div></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">E-mail</label><input class="input" id="patEmail" /></div><div class="input-group"><label class="input-label">Convênio</label><select class="input" id="patInsurance"><option>Particular</option><option>Unimed</option><option>Amil</option><option>Bradesco Saúde</option><option>SulAmérica</option></select></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addPatientModal')">Cancelar</button><button class="btn btn-primary" onclick="addPatient()">Cadastrar Paciente</button></div>
+  </div>
+</div>
+
+<!-- Add Appointment -->
+<div class="modal-overlay" id="addApptModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Nova Consulta</div><button class="modal-close" onclick="closeModal('addApptModal')">✕</button></div>
+    <div class="input-group"><label class="input-label">Paciente</label><select class="input" id="apptPatient"></select></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Data</label><input class="input" type="date" id="apptDate" /></div><div class="input-group"><label class="input-label">Horário</label><input class="input" type="time" id="apptTime" value="09:00" /></div></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Profissional</label><select class="input" id="apptDoctor"><option>Dr. Roberto Silva</option><option>Dra. Ana Pereira</option><option>Dr. Carlos Mendes</option></select></div><div class="input-group"><label class="input-label">Procedimento</label><select class="input" id="apptProc"><option>Consulta de Avaliação</option><option>Limpeza / Profilaxia</option><option>Clareamento</option><option>Endodontia</option><option>Implante</option><option>Ortodontia</option><option>Extração</option></select></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addApptModal')">Cancelar</button><button class="btn btn-primary" onclick="addAppointment()">Agendar</button></div>
+  </div>
+</div>
+
+<!-- Add Staff -->
+<div class="modal-overlay" id="addStaffModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Novo Colaborador</div><button class="modal-close" onclick="closeModal('addStaffModal')">✕</button></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Nome</label><input class="input" id="staffName" /></div><div class="input-group"><label class="input-label">Cargo</label><select class="input" id="staffRole"><option>Dentista</option><option>Recepcionista</option><option>Auxiliar</option><option>Técnico em Radiologia</option><option>Gerente</option></select></div></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">E-mail</label><input class="input" id="staffEmail" /></div><div class="input-group"><label class="input-label">Salário (R$)</label><input class="input" type="number" id="staffSalary" /></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addStaffModal')">Cancelar</button><button class="btn btn-primary" onclick="addStaff()">Adicionar</button></div>
+  </div>
+</div>
+
+<!-- Add Item (Stock) -->
+<div class="modal-overlay" id="addItemModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Novo Item</div><button class="modal-close" onclick="closeModal('addItemModal')">✕</button></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Produto</label><input class="input" id="itemName" /></div><div class="input-group"><label class="input-label">Categoria</label><select class="input" id="itemCategory"><option>Material Descartável</option><option>Medicamento</option><option>Instrumento</option><option>EPI</option><option>Resina / Cimento</option></select></div></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Quantidade</label><input class="input" type="number" id="itemQty" /></div><div class="input-group"><label class="input-label">Mínimo</label><input class="input" type="number" id="itemMin" /></div></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Custo Unitário (R$)</label><input class="input" type="number" id="itemCost" /></div><div class="input-group"><label class="input-label">Fornecedor</label><input class="input" id="itemSupplier" /></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addItemModal')">Cancelar</button><button class="btn btn-primary" onclick="addStockItem()">Adicionar</button></div>
+  </div>
+</div>
+
+<!-- Add Template -->
+<div class="modal-overlay" id="addTemplateModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Novo Template</div><button class="modal-close" onclick="closeModal('addTemplateModal')">✕</button></div>
+    <div class="input-group"><label class="input-label">Nome do Template</label><input class="input" id="tplName" /></div>
+    <div class="input-group"><label class="input-label">Mensagem</label><textarea class="input" rows="4" id="tplText" placeholder="Use {{nome}}, {{data}}, {{hora}} como variáveis..."></textarea></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addTemplateModal')">Cancelar</button><button class="btn btn-primary" onclick="addTemplate()">Salvar Template</button></div>
+  </div>
+</div>
+
+<!-- Add Stock Movement -->
+<div class="modal-overlay" id="addMovementModal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Entrada de Estoque</div><button class="modal-close" onclick="closeModal('addMovementModal')">✕</button></div>
+    <div class="input-group"><label class="input-label">Produto</label><select class="input" id="mvtItem"></select></div>
+    <div class="input-row"><div class="input-group"><label class="input-label">Quantidade</label><input class="input" type="number" id="mvtQty" /></div><div class="input-group"><label class="input-label">Tipo</label><select class="input" id="mvtType"><option>Entrada</option><option>Saída</option></select></div></div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('addMovementModal')">Cancelar</button><button class="btn btn-primary" onclick="addMovement()">Registrar</button></div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

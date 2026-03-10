@@ -1,0 +1,41 @@
+name: Deploy to KVM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.KVM_HOST }}
+          username: ${{ secrets.KVM_USER }}
+          key: ${{ secrets.KVM_SSH_KEY }}
+          port: 22
+          script: |
+            # Go to project directory (create if first deploy)
+            mkdir -p /root/apps/dental-crm
+            cd /root/apps/dental-crm
+
+            # Pull latest code
+            if [ -d .git ]; then
+              git pull origin main
+            else
+              git clone https://github.com/Gugaoi/dental-crm.git .
+            fi
+
+            # Build and restart container
+            docker compose down
+            docker compose build --no-cache
+            docker compose up -d
+
+            echo "✅ Dental CRM deployed successfully!"
