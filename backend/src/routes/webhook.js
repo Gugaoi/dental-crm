@@ -37,18 +37,20 @@ router.post('/deploy', (req, res) => {
   // Respond immediately so GitHub doesn't time out
   res.json({ message: 'Deploy started' });
 
-  // Run deploy asynchronously
-  setImmediate(() => {
-    try {
-      execSync(`cd ${APP_DIR} && git pull origin master && docker compose build --no-cache && docker compose up -d`, {
-        stdio: 'inherit',
-        timeout: 300000 // 5 min max
-      });
-      console.log('✅ Deploy completed successfully');
-    } catch (err) {
-      console.error('❌ Deploy failed:', err.message);
-    }
-  });
+  // Run deploy asynchronously without blocking event loop
+  setTimeout(() => {
+    const { exec } = require('child_process');
+    exec(`cd ${APP_DIR} && git pull origin master && docker compose build --no-cache frontend backend && docker compose up -d`, 
+      { timeout: 300000 }, 
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error('❌ Deploy failed:', error.message);
+          return;
+        }
+        console.log('✅ Deploy completed successfully');
+      }
+    );
+  }, 1000); // 1s delay to ensure res.json is flushed to network
 });
 
 module.exports = router;
