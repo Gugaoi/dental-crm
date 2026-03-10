@@ -120,7 +120,7 @@ function renderDashboard() {
   // Leads table
   const lt = document.getElementById('dashLeadsTable');
   lt.innerHTML = `<thead><tr><th>Nome</th><th>Interesse</th><th>Origem</th><th>Estágio</th></tr></thead>
-    <tbody>${DATA.leads.slice(0,5).map(l=>`<tr>
+    <tbody>${leadsData.slice(0,5).map(l=>`<tr>
       <td><strong>${l.name}</strong></td><td>${l.interest}</td><td>${l.source}</td>
       <td>${stageBadge(l.stage)}</td>
     </tr>`).join('')}</tbody>`;
@@ -153,10 +153,24 @@ function stageBadge(s) {
   const labels = {novo:'Novo',contato:'Contactado',consulta:'Consulta',ganho:'Ganho',perdido:'Perdido'};
   return `<span class="badge ${map[s]||'badge-blue'}">${labels[s]||s}</span>`;
 }
-function renderLeads() {
+let leadsData = [];
+
+async function fetchLeads() {
+  try {
+    const res = await apiFetch('/leads');
+    leadsData = await res.json();
+    return leadsData;
+  } catch(err) {
+    console.error(err);
+    return [];
+  }
+}
+
+async function renderLeads() {
+  const lds = await fetchLeads();
   const board = document.getElementById('kanbanBoard');
   board.innerHTML = kanbanCols.map(col => {
-    const cards = DATA.leads.filter(l=>l.stage===col.key);
+    const cards = lds.filter(l=>l.stage===col.key);
     return `<div class="kanban-col">
       <div class="kanban-col-header">
         <div class="kanban-col-title"><span style="color:${col.color}">●</span> ${col.label}</div>
@@ -165,7 +179,7 @@ function renderLeads() {
       <div class="kanban-cards">
         ${cards.map(l=>`<div class="kanban-card" onclick="openLeadDetail(${l.id})">
           <div class="kanban-card-name">${l.name}</div>
-          <div class="kanban-card-meta"><span>📱 ${l.phone}</span><span style="margin-left:auto;color:var(--accent-4);font-weight:700">${l.value}</span></div>
+          <div class="kanban-card-meta"><span>📱 ${l.phone}</span><span style="margin-left:auto;color:var(--accent-4);font-weight:700">${l.value?'R$ '+l.value:'—'}</span></div>
           <div class="kanban-card-source"><span class="tag">${l.interest}</span> <span class="tag">${l.source}</span></div>
         </div>`).join('')}
         <button class="kanban-add-btn" onclick="document.getElementById('leadStage').value='${col.key}';openModal('addLeadModal')">+ Adicionar</button>
@@ -173,37 +187,100 @@ function renderLeads() {
     </div>`;
   }).join('');
 }
+
 function openLeadDetail(id) {
-  const l = DATA.leads.find(x=>x.id===id);
+  const l = leadsData.find(x=>x.id===id);
+  if(!l) return;
   document.getElementById('leadDetailName').textContent = l.name;
   document.getElementById('leadDetailContent').innerHTML = `
     <div class="grid grid-2 mb-16">
-      <div class="input-group"><label class="input-label">Telefone</label><div class="input">${l.phone}</div></div>
-      <div class="input-group"><label class="input-label">Origem</label><div class="input">${l.source}</div></div>
+      <div class="input-group"><label class="input-label">Telefone</label><div class="input">${l.phone||'-'}</div></div>
+      <div class="input-group"><label class="input-label">Origem</label><div class="input">${l.source||'-'}</div></div>
     </div>
     <div class="grid grid-2 mb-16">
-      <div class="input-group"><label class="input-label">Interesse</label><div class="input">${l.interest}</div></div>
-      <div class="input-group"><label class="input-label">Valor Estimado</label><div class="input">${l.value}</div></div>
+      <div class="input-group"><label class="input-label">Interesse</label><div class="input">${l.interest||'-'}</div></div>
+      <div class="input-group"><label class="input-label">Valor Estimado</label><div class="input">R$ ${l.value||'0,00'}</div></div>
     </div>
     <div class="input-group"><label class="input-label">Estágio</label>
-      <select class="input" onchange="DATA.leads.find(x=>x.id===${l.id}).stage=this.value;renderLeads()">
+      <select class="input" onchange="updateLeadStage(${l.id}, this.value)">
         ${kanbanCols.map(c=>`<option value="${c.key}"${l.stage===c.key?' selected':''}>${c.label}</option>`).join('')}
       </select>
+    </div>
+    <div style="margin-top:24px;display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="convertLead(${l.id})" ${l.stage!=='ganho'?'disabled title="Mude o estágio para Ganho primeiro"':''}>Converter em Paciente</button>
+        <button class="btn btn-ghost" style="color:var(--accent-6)" onclick="deleteLead(${l.id})">Excluir Lead</button>
     </div>`;
   openModal('leadDetailModal');
 }
-function addLead() {
+
+async function updateLeadStage(id, newStage) {
+    try {
+        await apiFetch(`/leads/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ stage: newStage })
+        });
+        await renderLeads();
+        if(newStage === 'ganho') {
+          showToast('Lead marcado como Ganho!', 'success');
+          // re-open modal to refresh the Convert button state
+          openLeadDetail(id);
+        }
+    } catch(err) {
+        showToast('Erro ao atualizar estágio', 'error');
+    }
+}
+
+async function addLead() {
   const name = document.getElementById('leadName').value.trim();
   if(!name){ showToast('Informe o nome do lead','error'); return; }
-  DATA.leads.push({id:Date.now(),name,phone:document.getElementById('leadPhone').value,interest:document.getElementById('leadInterest').value,source:document.getElementById('leadSource').value,stage:document.getElementById('leadStage').value,value:'—',date:new Date().toLocaleDateString('pt-BR')});
-  closeModal('addLeadModal');
-  renderLeads();
-  showToast('Lead adicionado!','success');
+  
+  const payload = {
+    name,
+    phone: document.getElementById('leadPhone').value,
+    interest: document.getElementById('leadInterest').value,
+    source: document.getElementById('leadSource').value,
+    stage: document.getElementById('leadStage').value,
+    value: 0
+  };
+
+  try {
+      await apiFetch('/leads', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+      });
+      closeModal('addLeadModal');
+      await renderLeads();
+      showToast('Lead adicionado!', 'success');
+  } catch(err) {
+      showToast('Erro ao adicionar lead', 'error');
+  }
 }
-function convertLead() {
-  closeModal('leadDetailModal');
-  navigate('patients', document.querySelector('.nav-item[data-page="patients"]'));
-  showToast('Lead convertido em paciente!','success');
+
+async function convertLead(id) {
+    if(!confirm('Deseja converter este lead em um paciente ativo?')) return;
+    try {
+        await apiFetch(`/leads/${id}/convert`, { method: 'POST' });
+        closeModal('leadDetailModal');
+        await renderLeads();
+        // Fetch new patients so they appear in schedule
+        await fetchPatients();
+        showToast('Lead convertido em paciente!', 'success');
+        navigate('patients', document.querySelector('.nav-item[data-page="patients"]'));
+    } catch(err) {
+        showToast('Erro ao converter lead', 'error');
+    }
+}
+
+async function deleteLead(id) {
+    if(!confirm('Tem certeza que deseja excluir o lead?')) return;
+    try {
+        await apiFetch(`/leads/${id}`, { method: 'DELETE' });
+        closeModal('leadDetailModal');
+        await renderLeads();
+        showToast('Lead excluído!', 'success');
+    } catch(err) {
+        showToast('Erro ao excluir', 'error');
+    }
 }
 
 // ===== PATIENTS =====
@@ -712,8 +789,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   calYear = today.getFullYear();
   calMonth = today.getMonth();
   document.getElementById('apptDate').value = today.toISOString().split('T')[0];
-  renderDashboard();
-  // Fetch patients on load so the dropdowns (like schedule) have data
+  // Fetch patients and leads on load so the dropdowns (like schedule) have data
   const p = await fetchPatients();
   populateApptPatients(p);
+  await fetchLeads();
+  renderDashboard();
 });
