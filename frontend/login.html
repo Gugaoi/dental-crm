@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DentalCRM – Login & Cadastro</title>
+  <meta name="description" content="Acesse o DentalCRM para iniciar a gestão inteligente da sua clínica." />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--bg-body);
+      overflow-y: auto;
+      padding: 40px 20px;
+    }
+    .auth-container {
+      width: 100%;
+      max-width: 480px;
+      padding: 40px;
+      background: var(--bg-panel);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .auth-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .auth-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    .auth-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .auth-sub {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 30px;
+    }
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .auth-tab.active {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .auth-form {
+      display: none;
+    }
+    .auth-form.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(108, 92, 231, 0.05);
+    }
+    .btn-auth {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+    }
+    .btn-auth:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+    .form-error {
+      color: var(--accent-6); /* Red */
+      font-size: 13px;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-container">
+  <div class="auth-logo">
+    <div class="auth-icon">🦷</div>
+    <div class="auth-title">DentalCRM</div>
+    <div class="auth-sub">Gestão Inteligente para Clínicas</div>
+  </div>
+
+  <div class="auth-tabs">
+    <div class="auth-tab active" onclick="switchTab('login')">Acessar Conta</div>
+    <div class="auth-tab" onclick="switchTab('register')">Cadastrar Clínica</div>
+  </div>
+
+  <!-- Formulário de Login -->
+  <div id="form-login" class="auth-form active">
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">E-mail</label>
+        <input type="email" id="loginEmail" class="form-input" placeholder="dr.exemplo@clinica.com" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">Senha</label>
+        <input type="password" id="loginPassword" class="form-input" placeholder="Sua senha secreta" required />
+      </div>
+      <div id="loginError" class="form-error"></div>
+      <button type="submit" class="btn-auth" id="btnLogin">Entrar no CRM</button>
+    </form>
+  </div>
+
+  <!-- Formulário de Cadastro (Multi-tenant) -->
+  <div id="form-register" class="auth-form">
+    <form onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label class="form-label" for="regClinic">Nome da Clínica</label>
+        <input type="text" id="regClinic" class="form-input" placeholder="Ex: Clínica Sorriso Perfeito" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regName">Seu Nome</label>
+        <input type="text" id="regName" class="form-input" placeholder="Dr(a). Seu Nome" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regEmail">E-mail de Acesso</label>
+        <input type="email" id="regEmail" class="form-input" placeholder="contato@clinica.com" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regPassword">Senha</label>
+        <input type="password" id="regPassword" class="form-input" placeholder="Crie uma senha forte" required minlength="6" />
+      </div>
+      <div id="registerError" class="form-error"></div>
+      <button type="submit" class="btn-auth" id="btnRegister">Criar Conta e Clínica</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/auth.js"></script>
+</body>
+</html>
