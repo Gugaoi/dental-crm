@@ -13,6 +13,8 @@ const paymentsRoutes = require('./routes/payments');
 const dashboardRoutes = require('./routes/dashboard');
 const reportsRoutes = require('./routes/reports');
 const templatesRoutes = require('./routes/templates');
+const webhookRoutes = require('./routes/webhook');
+
 
 const app = express();
 
@@ -35,6 +37,8 @@ app.use('/api/payments',     paymentsRoutes);
 app.use('/api/dashboard',    dashboardRoutes);
 app.use('/api/reports',      reportsRoutes);
 app.use('/api/templates',    templatesRoutes);
+app.use('/api/webhook',      webhookRoutes);
+
 
 // Global error handler
 app.use((err, req, res, next) => {
