@@ -44,6 +44,7 @@ services:
       - internal
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=root_default"
       # API is served at /api/* on the same domain
       - "traefik.http.routers.dental-crm-api.rule=Host(`crm.edus-system.cloud`) && PathPrefix(`/api`)"
       - "traefik.http.routers.dental-crm-api.tls=true"
