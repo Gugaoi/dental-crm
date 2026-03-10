@@ -49,7 +49,6 @@ services:
       - "traefik.http.routers.dental-crm-api.tls=true"
       - "traefik.http.routers.dental-crm-api.entrypoints=web,websecure"
       - "traefik.http.routers.dental-crm-api.tls.certresolver=mytlschallenge"
-      - "traefik.http.routers.dental-crm-api.priority=10"
       - "traefik.http.services.dental-crm-api.loadbalancer.server.port=3001"
 
   # ──────────────────────────────────────────────
