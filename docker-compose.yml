@@ -7,17 +7,20 @@ services:
       - traefik-net
     labels:
       - "traefik.enable=true"
-      # Change 'crm.edus-system.cloud' to your chosen subdomain
       - "traefik.http.routers.dental-crm.rule=Host(`crm.edus-system.cloud`)"
-      - "traefik.http.routers.dental-crm.entrypoints=websecure"
       - "traefik.http.routers.dental-crm.tls=true"
-      - "traefik.http.routers.dental-crm.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dental-crm.entrypoints=web,websecure"
+      - "traefik.http.routers.dental-crm.tls.certresolver=mytlschallenge"
+      - "traefik.http.middlewares.dental-crm.headers.SSLRedirect=true"
+      - "traefik.http.middlewares.dental-crm.headers.STSSeconds=315360000"
+      - "traefik.http.middlewares.dental-crm.headers.browserXSSFilter=true"
+      - "traefik.http.middlewares.dental-crm.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.dental-crm.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.dental-crm.headers.SSLHost=edus-system.cloud"
+      - "traefik.http.middlewares.dental-crm.headers.STSIncludeSubdomains=true"
+      - "traefik.http.middlewares.dental-crm.headers.STSPreload=true"
+      - "traefik.http.routers.dental-crm.middlewares=dental-crm@docker"
       - "traefik.http.services.dental-crm.loadbalancer.server.port=80"
-      # HTTP → HTTPS redirect
-      - "traefik.http.routers.dental-crm-http.rule=Host(`crm.edus-system.cloud`)"
-      - "traefik.http.routers.dental-crm-http.entrypoints=web"
-      - "traefik.http.routers.dental-crm-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
 networks:
   traefik-net:
