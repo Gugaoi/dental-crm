@@ -207,47 +207,94 @@ function convertLead() {
 }
 
 // ===== PATIENTS =====
-function renderPatients() {
-  renderPatientsTable(filteredPatients);
-  populateApptPatients();
+let patientsData = [];
+
+async function fetchPatients(query = '') {
+  try {
+    const res = await apiFetch(`/patients${query}`);
+    patientsData = await res.json();
+    return patientsData;
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
 }
+
+async function renderPatients() {
+  const p = await fetchPatients();
+  renderPatientsTable(p);
+  populateApptPatients(p);
+}
+
 function renderPatientsTable(list) {
   const t = document.getElementById('patientsTable');
   t.innerHTML = `<thead><tr><th>Paciente</th><th>CPF</th><th>Telefone</th><th>Convênio</th><th>Status</th><th>Ações</th></tr></thead>
   <tbody>${list.map(p=>`<tr>
     <td><div class="flex items-center gap-8"><div class="avatar avatar-sm" style="background:${p.color}">${p.avatar}</div><strong>${p.name}</strong></div></td>
-    <td>${p.cpf}</td><td>${p.phone}</td><td>${p.insurance}</td>
+    <td>${p.cpf||'-'}</td><td>${p.phone||'-'}</td><td>${p.insurance||'-'}</td>
     <td>${statusBadge(p.status)}</td>
-    <td><button class="btn btn-ghost btn-sm" onclick="navigate('prontuario',document.querySelector('.nav-item[data-page=prontuario]'))">📋</button>
-        <button class="btn btn-ghost btn-sm" onclick="openModal('addApptModal')">📅</button></td>
+    <td><button class="btn btn-ghost btn-sm" title="Prontuário" onclick="navigate('prontuario',document.querySelector('.nav-item[data-page=prontuario]'))">📋</button>
+        <button class="btn btn-ghost btn-sm" title="Agendar" onclick="openModal('addApptModal')">📅</button>
+        <button class="btn btn-ghost btn-sm" title="Excluir" style="color:var(--accent-6)" onclick="deletePatient(${p.id})">🗑️</button></td>
   </tr>`).join('')}</tbody>`;
 }
-function filterPatients(q) {
-  const v = q.toLowerCase();
-  filteredPatients = DATA.patients.filter(p=>p.name.toLowerCase().includes(v)||p.cpf.includes(v)||p.phone.includes(v));
-  renderPatientsTable(filteredPatients);
+
+async function filterPatients(q) {
+  const p = await fetchPatients(q ? `?search=${encodeURIComponent(q)}` : '');
+  renderPatientsTable(p);
 }
-function filterPatientsByStatus(s) {
-  filteredPatients = s ? DATA.patients.filter(p=>p.status===s) : [...DATA.patients];
-  renderPatientsTable(filteredPatients);
+
+async function filterPatientsByStatus(s) {
+  const p = await fetchPatients(s ? `?status=${encodeURIComponent(s)}` : '');
+  renderPatientsTable(p);
 }
+
 function statusBadge(s) {
   const map = {'Ativo':'badge-green','Inativo':'badge-red','Em tratamento':'badge-blue'};
   return `<span class="badge ${map[s]||'badge-blue'}">${s}</span>`;
 }
-function addPatient() {
+
+async function addPatient() {
   const name = document.getElementById('patName').value.trim();
   if(!name){ showToast('Informe o nome','error'); return; }
-  const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ec4899','#06b6d4'];
-  DATA.patients.push({id:Date.now(),name,cpf:document.getElementById('patCpf').value,dob:document.getElementById('patDob').value,phone:document.getElementById('patPhone').value,email:document.getElementById('patEmail').value,insurance:document.getElementById('patInsurance').value,status:'Ativo',avatar:name.split(' ').map(w=>w[0]).slice(0,2).join(''),color:colors[DATA.patients.length%colors.length]});
-  filteredPatients = [...DATA.patients];
-  closeModal('addPatientModal');
-  renderPatients();
-  showToast('Paciente cadastrado!','success');
+  
+  const payload = {
+    name,
+    cpf: document.getElementById('patCpf').value,
+    dob: document.getElementById('patDob').value,
+    phone: document.getElementById('patPhone').value,
+    email: document.getElementById('patEmail').value,
+    insurance: document.getElementById('patInsurance').value,
+    status: 'Ativo'
+  };
+
+  try {
+    await apiFetch('/patients', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    closeModal('addPatientModal');
+    renderPatients();
+    showToast('Paciente cadastrado!', 'success');
+  } catch (err) {
+    showToast('Erro ao cadastrar', 'error');
+  }
 }
-function populateApptPatients() {
+
+async function deletePatient(id) {
+  if(!confirm('Tem certeza que deseja excluir o paciente?')) return;
+  try {
+    await apiFetch(`/patients/${id}`, { method: 'DELETE' });
+    renderPatients();
+    showToast('Paciente removido!', 'success');
+  } catch (err) {
+    showToast('Erro ao remover', 'error');
+  }
+}
+
+function populateApptPatients(list = patientsData) {
   const sel = document.getElementById('apptPatient');
-  if(sel) sel.innerHTML = DATA.patients.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  if(sel) sel.innerHTML = list.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
 }
 
 // ===== SCHEDULE =====
@@ -660,11 +707,13 @@ function renderSettings() {
 }
 
 // ===== INIT =====
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const today = new Date();
   calYear = today.getFullYear();
   calMonth = today.getMonth();
   document.getElementById('apptDate').value = today.toISOString().split('T')[0];
   renderDashboard();
-  populateApptPatients();
+  // Fetch patients on load so the dropdowns (like schedule) have data
+  const p = await fetchPatients();
+  populateApptPatients(p);
 });
