@@ -1,7 +1,11 @@
 services:
-  dental-crm:
-    build: .
-    container_name: dental-crm
+
+  # ──────────────────────────────────────────────
+  # FRONTEND  — Nginx serving static HTML/CSS/JS
+  # ──────────────────────────────────────────────
+  frontend:
+    build: ./frontend
+    container_name: dental-crm-frontend
     restart: unless-stopped
     networks:
       - traefik-net
@@ -22,7 +26,77 @@ services:
       - "traefik.http.routers.dental-crm.middlewares=dental-crm@docker"
       - "traefik.http.services.dental-crm.loadbalancer.server.port=80"
 
+  # ──────────────────────────────────────────────
+  # BACKEND  — Node.js + Express API
+  # ──────────────────────────────────────────────
+  backend:
+    build: ./backend
+    container_name: dental-crm-backend
+    restart: unless-stopped
+    env_file: ./backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - traefik-net
+      - internal
+    labels:
+      - "traefik.enable=true"
+      # API is served at /api/* on the same domain
+      - "traefik.http.routers.dental-crm-api.rule=Host(`crm.edus-system.cloud`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.dental-crm-api.tls=true"
+      - "traefik.http.routers.dental-crm-api.entrypoints=web,websecure"
+      - "traefik.http.routers.dental-crm-api.tls.certresolver=mytlschallenge"
+      - "traefik.http.routers.dental-crm-api.priority=10"
+      - "traefik.http.services.dental-crm-api.loadbalancer.server.port=3001"
+
+  # ──────────────────────────────────────────────
+  # POSTGRES  — Dedicated database for the CRM
+  # ──────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: dental-crm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dental_crm
+      POSTGRES_USER: crm_user
+      POSTGRES_PASSWORD: crm_pass
+    volumes:
+      - dental_crm_postgres:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crm_user -d dental_crm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────────
+  # REDIS  — Cache + session store
+  # ──────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: dental-crm-redis
+    restart: unless-stopped
+    volumes:
+      - dental_crm_redis:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 networks:
   traefik-net:
     external: true
     name: root_default
+  internal:
+    driver: bridge
+
+volumes:
+  dental_crm_postgres:
+  dental_crm_redis:

@@ -22,20 +22,30 @@ jobs:
           key: ${{ secrets.KVM_SSH_KEY }}
           port: 22
           script: |
-            # Go to project directory (create if first deploy)
+            # Go to project directory
             mkdir -p /root/apps/dental-crm
             cd /root/apps/dental-crm
 
             # Pull latest code
             if [ -d .git ]; then
-              git pull origin main
+              git pull origin master
             else
               git clone https://github.com/Gugaoi/dental-crm.git .
             fi
 
-            # Build and restart container
+            # Create .env if it doesn't exist (first deploy)
+            if [ ! -f backend/.env ]; then
+              cp backend/.env.example backend/.env
+              echo "⚠️  Created backend/.env from example — please update secrets!"
+            fi
+
+            # Build and restart all 4 containers
             docker compose down
             docker compose build --no-cache
             docker compose up -d
+
+            # Wait for backend to be healthy
+            sleep 5
+            docker compose ps
 
             echo "✅ Dental CRM deployed successfully!"

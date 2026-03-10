@@ -16,7 +16,10 @@ desktop.ini
 dental-crm-deploy
 dental-crm-deploy.pub
 
-# Node (future)
+# Node
 node_modules/
 .env
 .env.local
+
+# Backend secrets — NEVER commit the real .env
+backend/.env
