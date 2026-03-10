@@ -3,8 +3,8 @@
 // Verifica se já está logado ao carregar a página de login
 document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('dental_crm_token');
-  if (token) {
-    // Se já tem token, redireciona pro painel
+  // Só redireciona se estiver na tela de login
+  if (token && window.location.pathname.includes('login.html')) {
     window.location.href = '/';
   }
 });
