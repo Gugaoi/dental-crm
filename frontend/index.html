@@ -6,8 +6,14 @@
   <title>DentalCRM – Gestão Completa para Clínicas Odontológicas</title>
   <meta name="description" content="CRM completo para clínicas odontológicas: agendamento, leads, prontuário, WhatsApp, RH, estoque e muito mais." />
   <link rel="stylesheet" href="css/style.css" />
+  <script>
+    if (!localStorage.getItem('dental_crm_token')) {
+      window.location.replace('/login.html');
+    }
+  </script>
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 <div class="app-shell">
 
   <!-- ===== SIDEBAR ===== -->
@@ -741,25 +747,31 @@
   </div>
 </div>
 
+<!-- Confirm Dialog -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title" id="confirmTitle">Confirmar</div>
+      <button class="modal-close" onclick="cancelConfirm()">✕</button>
+    </div>
+    <p id="confirmMessage" style="color:var(--text-secondary);font-size:14px;line-height:1.6"></p>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cancelConfirm()">Cancelar</button>
+      <button class="btn btn-danger" id="confirmOkBtn" onclick="doConfirm()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
 <script src="js/auth.js"></script>
 <script>
-  // Block access to dashboard if not logged in
   document.addEventListener('DOMContentLoaded', () => {
-    const token = localStorage.getItem('dental_crm_token');
     const user = JSON.parse(localStorage.getItem('dental_crm_user') || '{}');
-    if (!token) {
-      window.location.href = '/login.html';
-      return;
-    }
-    
-    // Set dynamic user data
     if (user.name) {
-      document.getElementById('sidebarName').textContent = user.name;
-      // create initials
       const initText = user.name.split(' ').map(n=>n[0]).join('').substring(0, 2).toUpperCase();
+      document.getElementById('sidebarName').textContent = user.name;
       document.getElementById('sidebarAvatar').textContent = initText || '👤';
       document.querySelector('.topbar-actions .user-avatar').textContent = initText || '👤';
     }

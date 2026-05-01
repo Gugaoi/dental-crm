@@ -56,16 +56,54 @@ function renderPage(page) {
 }
 
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('collapsed');
-  document.getElementById('mainContent').classList.toggle('sidebar-collapsed');
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    document.getElementById('sidebar').classList.toggle('mobile-open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+  } else {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+    document.getElementById('mainContent').classList.toggle('sidebar-collapsed');
+  }
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
 }
 
 // ===== MODAL =====
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+  if (e.target.classList.contains('modal-overlay') && e.target.id !== 'confirmModal') {
+    e.target.classList.remove('open');
+  }
 });
+
+// ===== CONFIRM DIALOG =====
+let _confirmResolve = null;
+function showConfirm(message, title = 'Confirmar ação') {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMessage').textContent = message;
+  openModal('confirmModal');
+  return new Promise(resolve => { _confirmResolve = resolve; });
+}
+function doConfirm() {
+  closeModal('confirmModal');
+  if (_confirmResolve) { _confirmResolve(true); _confirmResolve = null; }
+}
+function cancelConfirm() {
+  closeModal('confirmModal');
+  if (_confirmResolve) { _confirmResolve(false); _confirmResolve = null; }
+}
+
+// ===== LOADING STATE =====
+function setTableLoading(tableId, cols) {
+  const t = document.getElementById(tableId);
+  if (!t) return;
+  const cell = `<td><div class="skeleton" style="height:14px;width:80%">&nbsp;</div></td>`;
+  const rows = Array(4).fill(`<tr>${Array(cols).fill(cell).join('')}</tr>`).join('');
+  t.innerHTML = `<tbody>${rows}</tbody>`;
+}
 
 // ===== TABS =====
 function switchTab(scope, panelId, btn) {
@@ -136,8 +174,16 @@ function renderDashboard() {
     </div>`).join('');
 }
 function toggleTask(id) {
-  const t = DATA.tasks.find(t=>t.id===id);
-  if(t){ t.done=!t.done; renderDashboard(); }
+  const t = DATA.tasks.find(t => t.id === id);
+  if (!t) return;
+  t.done = !t.done;
+  const pending = DATA.tasks.filter(t => !t.done).length;
+  document.getElementById('taskCount').textContent = `${pending} pendentes`;
+  document.getElementById('taskList').innerHTML = DATA.tasks.map(t => `
+    <div class="stat-row" style="cursor:pointer" onclick="toggleTask(${t.id})" role="button" tabindex="0">
+      <div style="font-size:18px">${t.done ? '✅' : '⬜'}</div>
+      <div style="flex:1;font-size:13px;${t.done ? 'text-decoration:line-through;color:var(--text-muted)' : ''}">${t.text}</div>
+    </div>`).join('');
 }
 
 // ===== LEADS =====
@@ -167,6 +213,7 @@ async function fetchLeads() {
 }
 
 async function renderLeads() {
+  document.getElementById('kanbanBoard').innerHTML = `<div style="display:flex;gap:16px">${Array(5).fill(`<div class="kanban-col" style="min-width:270px"><div style="padding:14px 16px;border-bottom:1px solid var(--border)"><div class="skeleton" style="height:16px;width:60%">&nbsp;</div></div><div style="padding:12px;display:flex;flex-direction:column;gap:10px">${Array(2).fill(`<div class="skeleton" style="height:80px;border-radius:8px">&nbsp;</div>`).join('')}</div></div>`).join('')}</div>`;
   const lds = await fetchLeads();
   const board = document.getElementById('kanbanBoard');
   board.innerHTML = kanbanCols.map(col => {
@@ -257,7 +304,7 @@ async function addLead() {
 }
 
 async function convertLead(id) {
-    if(!confirm('Deseja converter este lead em um paciente ativo?')) return;
+    if(!await showConfirm('Deseja converter este lead em um paciente ativo? Ele será adicionado à lista de pacientes.', 'Converter Lead')) return;
     try {
         await apiFetch(`/leads/${id}/convert`, { method: 'POST' });
         closeModal('leadDetailModal');
@@ -272,7 +319,7 @@ async function convertLead(id) {
 }
 
 async function deleteLead(id) {
-    if(!confirm('Tem certeza que deseja excluir o lead?')) return;
+    if(!await showConfirm('Tem certeza que deseja excluir este lead? Esta ação não pode ser desfeita.', 'Excluir Lead')) return;
     try {
         await apiFetch(`/leads/${id}`, { method: 'DELETE' });
         closeModal('leadDetailModal');
@@ -298,6 +345,7 @@ async function fetchPatients(query = '') {
 }
 
 async function renderPatients() {
+  setTableLoading('patientsTable', 6);
   const p = await fetchPatients();
   renderPatientsTable(p);
   populateApptPatients(p);
@@ -359,7 +407,7 @@ async function addPatient() {
 }
 
 async function deletePatient(id) {
-  if(!confirm('Tem certeza que deseja excluir o paciente?')) return;
+  if(!await showConfirm('Tem certeza que deseja excluir este paciente? Esta ação não pode ser desfeita.', 'Excluir Paciente')) return;
   try {
     await apiFetch(`/patients/${id}`, { method: 'DELETE' });
     renderPatients();
@@ -789,7 +837,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   calYear = today.getFullYear();
   calMonth = today.getMonth();
   document.getElementById('apptDate').value = today.toISOString().split('T')[0];
-  // Fetch patients and leads on load so the dropdowns (like schedule) have data
+
+  // Nav keyboard accessibility
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
+    });
+    // Close mobile sidebar when navigating
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeMobileSidebar();
+    });
+  });
+
   const p = await fetchPatients();
   populateApptPatients(p);
   await fetchLeads();
